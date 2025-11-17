@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless Sentiment API (Lambda + API Gateway + Comprehend)
+Globals:
+  Function:
+    Runtime: python3.9
+    Timeout: 10
+
+Resources:
+  SentimentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      CodeUri: ./
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - comprehend:DetectSentiment
+              Resource: '*'
+      Events:
+        SentimentApi:
+          Type: Api
+          Properties:
+            Path: /sentiment
+            Method: post
+
+Outputs:
+  SentimentApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/sentiment"
